@@ -1,0 +1,153 @@
+
+####### Python Codes 
+### Logistic Regression
+
+
+# import codes
+import pandas as pd
+import numpy as np
+from sklearn import preprocessing
+import matplotlib.pyplot as plt 
+
+plt.rc("font", size=14)
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+import seaborn as sns
+sns.set(style="white")
+sns.set(style="whitegrid", color_codes=True)
+
+
+# Current Working Directory 
+import os
+print(os.getcwd())
+
+
+# Print all files of default Directories 
+print(os.listdir(os.getcwd()))
+
+
+# Default path / Relative path. 
+data = pd.read_csv('bank.csv', header =0)
+
+
+# load file using Absolute path
+pd.read_csv('d:/Python/bank.csv')
+
+
+# To print dataset variables
+data.head()
+
+
+# List unique values of a variable. Eg: Education
+data['education'].unique()
+
+
+# Convert value of a variable into other: 'basic.9y' as 'Basic'
+data['education']=np.where(data['education'] =='basic.9y', 'Basic', data['education'])
+
+
+# count of variable Y
+data['y'].value_counts()
+
+
+# Graph by counts, using seasborn package
+graph = sns.countplot(x='y', data = data, palette = 'hls')
+graph
+
+
+## Count of variables distinct values or attributes   
+count_no_sub = len(data[data['y']==0])
+count_sub = len(data[data['y']==1])
+
+pct_of_no_sub = count_no_sub/(count_no_sub+count_sub)
+print("percentage of no subscription is", pct_of_no_sub*100)
+pct_of_sub = count_sub/(count_no_sub+count_sub)
+print("percentage of subscription", pct_of_sub*100)
+
+
+## Group variable by 'Y' and get mean of other varibles
+data.groupby('y').mean()
+
+
+data.groupby('job').mean()
+
+
+## VISUALIZATION - Bar Chart
+
+%matplotlib inline
+pd.crosstab(data.job, data.y).plot(kind='bar')
+plt.title('Purchase Frequency for Job Title')
+plt.xlabel('Job')
+plt.ylabel('Frequency of Purchase')
+plt.savefig('purchase_fre_job')
+
+
+## Visualization - Stack Bar. 
+table = pd.crosstab(data.marital, data.y)
+table.div(table.sum(1).astype(float), axis = 0).plot(kind="bar", stacked = True)
+plt.title('Stacked Bar Chart of Marital Status vs Purchase')
+plt.xlabel('Marital Status')
+plt.ylabel('Proportion of Customers')
+plt.savefig('mariral_vs_pur_stack')
+
+
+# Histogram
+data.age.hist()
+plt.title('Histogram of Age')
+plt.xlabel('Age')
+plt.ylabel('Frequency')
+plt.savefig('hist_age')
+
+
+## Logistic Regression
+from sklearn.linear_model import LogisticRegression 
+classifier = LogisticRegression(random_state = 0) 
+classifier.fit(x, y) 
+
+# Predict the values for Y
+y_pred = classifier.predict(x) 
+
+
+# Confusion Matrix
+from sklearn.metrics import confusion_matrix 
+cm = confusion_matrix(y, y_pred) 
+
+print ("Confusion Matrix : \n", cm) 
+
+
+######## Model accuracy
+from sklearn.metrics import accuracy_score 
+print ("Accuracy : ", accuracy_score(y, y_pred)) 
+
+
+######### Plotting Listed Color Map
+from matplotlib.colors import ListedColormap 
+X_set, y_set = x, y
+
+X1, X2 = np.meshgrid(np.arange(start = X_set[:, 0].min() - 1, 
+stop = X_set[:, 0].max() + 1, step = 0.01), 
+np.arange(start = X_set[:, 1].min() - 1, 
+stop = X_set[:, 1].max() + 1, step = 0.01)) 
+
+plt.contourf(X1, X2, classifier.predict( 
+np.array([X1.ravel(), X2.ravel()]).T).reshape( 
+X1.shape), alpha = 0.75, cmap = ListedColormap(('red', 'green'))) 
+
+plt.xlim(X1.min(), X1.max()) 
+plt.ylim(X2.min(), X2.max()) 
+
+for i, j in enumerate(np.unique(y_set)): 
+    plt.scatter(X_set[y_set == j, 0], X_set[y_set == j, 1], 
+c = ListedColormap(('red', 'green'))(i), label = j) 
+
+plt.title('Classifier (Test set)') 
+plt.xlabel('Age') 
+plt.ylabel('Estimated Salary') 
+plt.legend() 
+plt.show() 
+
+
+
+
+
+
